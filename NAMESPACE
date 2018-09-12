@@ -2,10 +2,13 @@
 
 importFrom(dplyr,arrange)
 importFrom(dplyr,desc)
+importFrom(dplyr,mutate)
 importFrom(dplyr,right_join)
 importFrom(dplyr,select)
 importFrom(magrittr,"%>%")
 importFrom(mbte,is_tbl_mbte)
 importFrom(mbte,mbte_reconstruct)
+importFrom(purrr,map)
+importFrom(rlang,is_scalar_character)
 importFrom(shiny,is.reactive)
 importFrom(shiny,req)

@@ -17,5 +17,7 @@ Imports:
   dplyr,
   magrittr,
   mbte,
+  purrr,
+  rlang,
   shiny
 RoxygenNote: 6.1.0
