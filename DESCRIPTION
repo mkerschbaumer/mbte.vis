@@ -1,0 +1,15 @@
+Package: shiny.mbte
+Title: Shiny frontend for signal-exploration
+Version: 0.0.0.9000
+Authors@R: person(
+    "Martin",
+    "Kerschbaumer",
+    email = "maff32@gmx.com",
+    role = c("aut", "cre")
+  )
+Description: Provide a shiny-app, that allows to explore fitted signals
+  (using the mbte-package). Filtering can be used to specific signals.
+Depends: R (>= 3.4.4)
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
