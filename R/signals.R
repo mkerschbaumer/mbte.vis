@@ -31,31 +31,3 @@ rearrange_signals_rv <- function(signals, metrics) {
 
   rearrange_signals(signals, metrics)
 }
-
-# modify fits-table: only keep target-fit (e.g. "lm")
-#' @importFrom dplyr mutate
-#' @importFrom mbte mbte_reconstruct
-#' @importFrom purrr map
-#' @importFrom rlang is_scalar_character
-split_fits <- function(fits_tbl, target) {
-  # symbol of fits-column
-  fits_col <- attr(fits_tbl, "fits")
-  stopifnot(is_scalar_character(target))
-
-  fits_tbl %>%
-    mutate(!!fits_col := map(!!fits_col, ~{
-      # only keep target column (e.g. "lm"); assumption: target column is
-      # present
-      .x[target]
-    })) %>%
-    mbte_reconstruct(fits)
-}
-
-#' @importFrom shiny is.reactive req
-split_fits_rv <- function(fits_tbl, target) {
-  stopifnot(is.reactive(fits_tbl))
-  fits_tbl <- fits_tbl()
-  req(fits_tbl)
-
-  split_fits(fits_tbl, target)
-}
