@@ -19,5 +19,6 @@ Imports:
   mbte,
   purrr,
   rlang,
-  shiny
+  shiny,
+  shinydashboard
 RoxygenNote: 6.1.0
