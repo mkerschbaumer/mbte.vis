@@ -8,6 +8,11 @@ tm_extract_quo.dtm <- function(x, ...) {
   x$fit_quo
 }
 
+#' @importFrom purrr map
+tm_extract_quos <- function(l) {
+  map(l, tm_extract_quo)
+}
+
 # extract plugin
 tm_extract_plugin <- function(x, ...) {
   UseMethod("tm_extract_plugin")
@@ -16,6 +21,11 @@ tm_extract_plugin <- function(x, ...) {
 # implementation for default trend module
 tm_extract_plugin.dtm <- function(x, ...) {
   x$plugin
+}
+
+#' @importFrom purrr map
+tm_extract_plugins <- function(l) {
+  map(l, tm_extract_plugin)
 }
 
 #' @importFrom dplyr filter
