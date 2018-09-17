@@ -81,3 +81,17 @@ setup_trend_modules <- function(fits_r, metrics_r, ...) {
 
   invoke(reactiveValues, invoked_servers)
 }
+
+#' @importFrom purrr as_mapper map
+#' @importFrom rlang list2 new_environment
+init_trend_modules <- function(...) {
+  # interpret ellipsis as module-builder functions
+  modules <- list2(...)
+  modules <- map(modules, as_mapper)
+
+  # create environment for storing coefficients
+  coef_env <- new_environment()
+
+  # invoke model-building functions with `coef_env`
+  map(modules, ~.x(coef_env))
+}
