@@ -31,12 +31,18 @@ tm_extract_plugins <- function(l) {
 #' @importFrom dplyr filter
 #' @importFrom magrittr "%>%"
 #' @importFrom shiny need reactive validate
-#' @importFrom shiny.plugin plugin_extract_id
-setup_trend_module <- function(module, fits_r, metrics_r) {
-  # extract shiny.plugin
-  plugin <- tm_extract_plugin(module)
+#' @importFrom shiny.plugin plugin_extract_id plugin_extract_server plugin_new_default
+wrap_plugin <- function(plugin, fits_r, metrics_r) {
   # ID / name of trend-fitting helper (e.g. 'lin' etc.)
   trend_name <- plugin_extract_id(plugin)
+
+  # split fits (only keep fits for current trend fitting module)
+  split_fits <- reactive({
+    fits_tbl <- fits_r()
+    req(fits_tbl)
+
+    split_fits_impl(fits_tbl, trend_name)
+  })
 
   # only keep metrics for used algorithm/trend fitting helper (e.g. 'lin')
   filtered_metrics <- reactive({
@@ -48,38 +54,36 @@ setup_trend_module <- function(module, fits_r, metrics_r) {
     filtered
   })
 
-  # split fits (only keep fits for current trend fitting module)
-  split_fits <- reactive({
-    fits_tbl <- fits_r()
-    req(fits_tbl)
-
-    split_fits_impl(fits_tbl, trend_name)
-  })
-
   # filter/rearrange fits according to fit performance
   rearranged_fits <- rearrange_fits_rv(split_fits, filtered_metrics)
 
-  # invoke shiny.plugin (pass filtered/rearranged fits instead of all fits)
-  callModule(plugin_extract_server(plugin), trend_name,
-    fits = rearranged_fits
+  # create wrapper sgda.plugin: use same ID but modified server function (pass
+  # `rearranged_fits` to original server function)
+  #
+  # NOTE: the wrapped plugin is only needed for the call to
+  # plugin_create_server() in setup_trend_modules()
+  plugin_new_default(
+    plugin_extract_id(plugin),
+    server = function(input, output, session) {
+      server_fun <- plugin_extract_server(plugin)
+      server_fun(input, output, session, fits = rearranged_fits)
+    }
   )
 }
 
 # NOTE: trend modules passed via ellipsis
 #' @importFrom purrr invoke map
 #' @importFrom rlang list2
-#' @importFrom shiny reactiveValues
-setup_trend_modules <- function(fits_r, metrics_r, ...) {
+#' @importFrom shiny getDefaultReactiveDomain reactiveValues
+setup_tm_servers <- function(fits_r, metrics_r, ...) {
   # trend modules
-  modules <- list2(...)
+  modules <- list2(...) %>%
+    map(wrap_plugin, fits_r = fits_r, metrics_r = metrics_r)
 
-  # invoke servers of trend modules
-  invoked_servers <- map(modules, setup_trend_module,
-    fits_r = fits_r,
-    metrics_r = metrics_r
-  )
-
-  invoke(reactiveValues, invoked_servers)
+  # use a custom namespace to avoid naming conflicts (e.g. a trend-module has
+  # the same name as a reactive in the global namespace)
+  session <- getDefaultReactiveDomain()
+  plugin_create_server(!!!modules, session = session$makeScope("wrappers"))
 }
 
 #' @importFrom purrr as_mapper map
