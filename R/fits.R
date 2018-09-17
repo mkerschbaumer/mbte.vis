@@ -4,16 +4,18 @@
 #' @importFrom dplyr arrange desc right_join select
 #' @importFrom magrittr "%>%"
 #' @importFrom mbte is_tbl_mbte mbte_reconstruct
-rearrange_fits <- function(fits, metrics) {
+#' @importFrom rlang syms
+rearrange_fits <- function(fits, metrics, by = "signal_id") {
   stopifnot(is_tbl_mbte(fits))
 
   # only keep signal_id-column and result (join afterwards should only add
   # the result-column)
-  metrics <- select(metrics, signal_id, result)
+  by_syms <- syms(by)
+  metrics <- select(metrics, !!!by_syms, result)
 
   # add result column and reorder rows
   fits %>%
-    right_join(metrics, by = "signal_id") %>%
+    right_join(metrics, by = by) %>%
     arrange(-desc(result)) %>%
     select(-result) %>%
     mbte_reconstruct(fits)
