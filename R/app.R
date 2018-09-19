@@ -25,6 +25,11 @@ app_server <- function(trend_plugins, fits, metrics) {
     trend_rv <- setup_tm_servers(fits_r, metrics_r, !!!trend_plugins)
 
     filtered_combined <- combine_fits(trend_rv)
+
+    # NOTE: 'fit' used for compatibility with metrics
+    rearranged <- rearrange_fits_rv(filtered_combined, metrics_r,
+      by = c("signal_id", "fit")
+    )
   }
 }
 
