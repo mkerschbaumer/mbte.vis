@@ -35,3 +35,37 @@ rearrange_fits_rv <- function(fits, metrics) {
     rearrange_fits(fits, metrics)
   })
 }
+
+# combine fits from individual trend-modules (assume, that a reactiveValues is
+# returned by each server function; an element named "filtered", being a
+# reactive, must be present)
+#
+# NOTE: it is assumed, that the column "signal_id" is present
+#' @importFrom magrittr "%>%"
+#' @importFrom mbte mbte_reconstruct
+#' @importFrom purrr map_dfr set_names
+#' @importFrom shiny is.reactive is.reactivevalues
+combine_fits <- function(trend_rv) {
+  stopifnot(is.reactivevalues(trend_rv))
+
+  reactive({
+    # needed for mbte_reconstruct()
+    stopifnot(length(trend_rv) != 0)
+    # NOTE: elements of trend_rv are reactives
+    reference <- (trend_rv[[names(trend_rv)[1]]])$filtered
+    stopifnot(is.reactive(reference))
+    reference <- reference()
+    fits <- attr(reference, "fits")
+
+    trend_rv %>%
+      names() %>%
+      set_names(.) %>%
+      map_dfr(~{
+        filtered_tbl_r <- trend_rv[[.x]]$filtered
+        stopifnot(is.reactive(filtered_tbl_r))
+        filtered_tbl_r()
+      }, .id = "fit") %>% # name of trend module
+      # ensure a tbl_mbte is returned
+      mbte_reconstruct(reference)
+  })
+}

@@ -23,6 +23,8 @@ app_server <- function(trend_plugins, fits, metrics) {
     metrics_r <- reactive(metrics)
 
     trend_rv <- setup_tm_servers(fits_r, metrics_r, !!!trend_plugins)
+
+    filtered_combined <- combine_fits(trend_rv)
   }
 }
 
