@@ -105,6 +105,7 @@ init_trend_modules <- function(...) {
 # trend-modules.
 #' @importFrom dplyr bind_cols filter select
 #' @importFrom mbte mbte_reconstruct
+#' @importFrom purrr as_mapper
 #' @importFrom rlang is_expression is_scalar_character
 #' @importFrom shiny callModule need NS p plotOutput reactive reactiveValues
 #'   renderPlot renderUI req selectInput strong textInput uiOutput validate
@@ -112,8 +113,12 @@ init_trend_modules <- function(...) {
 #' @importFrom shinydashboard box
 #' @importFrom tibble is_tibble
 coef_filter_plugin <- function(id, coef_env, title = id,
-                               selected_par = NULL, displayname = id) {
+                               selected_par = NULL, tr_fun = function(x) x,
+                               displayname = id) {
   stopifnot(is_scalar_character(id))
+
+  # transformation function (by default identity function)
+  tr_fun <- as_mapper(tr_fun)
 
   plugin_new_default(
     id = id,
@@ -153,10 +158,19 @@ coef_filter_plugin <- function(id, coef_env, title = id,
         )
       })
 
+      # apply transformation function to combined dataset
+      combined_transformed <- reactive({
+        combined <- combined()
+        req(combined)
+        combined %>%
+          tr_fun() %>%
+          mbte_reconstruct(combined)
+      })
+
       # filtering based on metrics provided by the user; filter/rearrange
       # according to signal_id present in both datasets (rearranging based on
       # computed metric)
-      metric_filtered <- filter_rearrange_fits_rv(combined, metrics)
+      metric_filtered <- filter_rearrange_fits_rv(combined_transformed, metrics)
 
       # data for the histogram (selected parameter)
       plot_dataset <- reactive({
