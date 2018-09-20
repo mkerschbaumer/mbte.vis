@@ -42,3 +42,79 @@ expr_input_server <- function(input, output, session, throttle_delay = 200,
   # return parsed expression
   expr
 }
+
+#' @importFrom shiny NS plotOutput tagList uiOutput
+hist_filter_ui <- function(id) {
+  ns <- NS(id)
+
+  tagList(
+    plotOutput(ns("plot")),
+    expr_input_ui(ns("filter_expr"), label = "Filter expression"),
+    uiOutput(ns("selected_obs"))
+  )
+}
+
+# The dataset to filter is passed as a tibble. `hist_col` is the name of the
+# column used for the histogram.
+#' @importFrom dplyr filter
+#' @importFrom mbte mbte_reconstruct
+#' @importFrom rlang is_expression
+#' @importFrom shiny is.reactive need p reactive renderPlot req strong validate
+hist_filter_server <- function(input, output, session, dataset, hist_col) {
+  stopifnot(is.reactive(dataset), is.reactive(hist_col))
+
+  # values for the histogram
+  hist_values <- reactive({
+    dataset <- dataset()
+    hist_col <- hist_col()
+    req(dataset, hist_col)
+    stopifnot(is.character(hist_col))
+    validate(
+      need(nrow(dataset) != 0, "No data to plot available.")
+    )
+
+    dataset[[hist_col]]
+  })
+
+  # draw histogram
+  output$plot <- renderPlot({
+    hist_values <- hist_values()
+    req(hist_values)
+    hist(hist_values)
+  })
+
+  # invoke server of plugin for filtering-expression
+  filter_expr <- callModule(expr_input_server, "filter_expr")
+
+  # perform filtering based on user-provided expression
+  filtered <- reactive({
+    filter_expr <- filter_expr()
+    stopifnot(is_expression(filter_expr))
+
+    dataset <- dataset()
+    req(dataset)
+    tryCatch(
+      dataset %>%
+        filter(!!filter_expr) %>% # use user-provided expression
+        mbte_reconstruct(dataset),
+      error = function(e) {
+        validate(
+          need(FALSE, paste("error while evaluating filter expression", e))
+        )
+      }
+    )
+  })
+
+  # show text indicating how many observations are selected
+  output$selected_obs <- renderUI({
+    dataset <- dataset() # unfiltered dataset
+    filtered <- filtered()
+    req(dataset, filtered)
+    n_total <- nrow(dataset)
+    n_selected <- nrow(filtered)
+    p(strong(n_selected), "/", n_total, " observations selected.")
+  })
+
+  # return `filtered` (reactive)
+  filtered
+}

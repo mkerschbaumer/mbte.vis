@@ -103,12 +103,12 @@ init_trend_modules <- function(...) {
 # that the corresponding fitting quosure stores fit-coefficients as a tibble in
 # `coef_env`). This function is intended to generate the shiny.plugin for
 # trend-modules.
-#' @importFrom dplyr bind_cols filter select
+#' @importFrom dplyr bind_cols select
 #' @importFrom mbte mbte_reconstruct
 #' @importFrom purrr as_mapper
-#' @importFrom rlang is_expression is_scalar_character
-#' @importFrom shiny callModule need NS p plotOutput reactive reactiveValues
-#'   renderPlot renderUI req selectInput strong textInput uiOutput validate
+#' @importFrom rlang is_scalar_character
+#' @importFrom shiny callModule NS reactive reactiveValues renderUI req
+#'   selectInput uiOutput validate
 #' @importFrom shiny.plugin plugin_new_default
 #' @importFrom shinydashboard box
 #' @importFrom tibble is_tibble
@@ -129,9 +129,7 @@ coef_filter_plugin <- function(id, coef_env, title = id,
         title = title,
         width = 4,
         uiOutput(ns("param_selector")),
-        plotOutput(ns("plot")),
-        expr_input_ui(ns("filter_expr"), label = "Filter expression"),
-        uiOutput(ns("remaining_samples"))
+        hist_filter_ui(ns("hist_selector"))
       )
     },
     server = function(input, output, session, fits, metrics) {
@@ -172,60 +170,27 @@ coef_filter_plugin <- function(id, coef_env, title = id,
       # computed metric)
       metric_filtered <- filter_rearrange_fits_rv(combined_transformed, metrics)
 
-      # data for the histogram (selected parameter)
-      plot_dataset <- reactive({
-        metric_filtered <- metric_filtered()
-        relative <- input$relative
-        choice <- input$to_display
-        req(metric_filtered, choice)
-        metric_filtered[[choice]]
-      })
+      # use histogram filter module and filter dataset according to
+      # user-provided expression involving model coefficients
+      coefs_filtered <- callModule(hist_filter_server, "hist_selector",
+        dataset = metric_filtered,
+        hist_col = reactive(input$to_display) # column for histogram
+      )
 
-      # draw histogram
-      output$plot <- renderPlot({
-        plot_dataset <- plot_dataset()
-        req(plot_dataset)
-        hist(plot_dataset)
-      })
-
-      # invoke server of plugin for filtering-expression
-      filter_expr <- callModule(expr_input_server, "filter_expr")
-
-      # perform filtering based on coefficients
-      coefs_filtered <- reactive({
-        filter_expr <- filter_expr()
-        stopifnot(is_expression(filter_expr))
-
-        metric_filtered <- metric_filtered()
+      # `coefs_filtered` without coefficient columns
+      filtered_without_coef <- reactive({
         coefs <- coefs()
-        req(metric_filtered, coefs)
-        cols_to_drop <- colnames(coefs)
-        tryCatch(
-          metric_filtered %>%
-            filter(!!filter_expr) %>% # use user-provided expression
-            select(-!!cols_to_drop) %>% # remove coefficient-columns
-            mbte_reconstruct(metric_filtered),
-          error = function(e) {
-            validate(
-              need(FALSE, paste("error while evaluating filter expression", e))
-            )
-          }
-        )
-      })
-
-      # show text indicating how many samples are selected (first metric-based-
-      # and then coefficient-based filtering is performed)
-      output$remaining_samples <- renderUI({
         coefs_filtered <- coefs_filtered()
-        metric_filtered <- metric_filtered()
-        total_fits <- nrow(metric_filtered)
-        selected_fits <- nrow(coefs_filtered)
-        p(strong(selected_fits), "/", total_fits, " fits selected.")
+        req(coefs, coefs_filtered)
+        to_remove <- colnames(coefs)
+        coefs_filtered %>%
+          select(-!!to_remove) %>%
+          mbte_reconstruct(coefs_filtered)
       })
 
       # return reactiveValues at the end
       rv <- reactiveValues()
-      rv$filtered <- coefs_filtered
+      rv$filtered <- filtered_without_coef
 
       rv
     },
