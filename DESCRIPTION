@@ -21,5 +21,6 @@ Imports:
   purrr,
   rlang,
   shiny,
-  shinydashboard
+  shinydashboard,
+  tibble
 RoxygenNote: 6.1.0
