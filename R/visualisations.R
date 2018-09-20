@@ -6,7 +6,8 @@ best_fit_vis_ui <- function(id) {
   uiOutput(ns("ui"))
 }
 
-#' @importFrom ggplot2 aes geom_point geom_path ggplot
+#' @importFrom ggplot2 aes geom_point geom_path ggplot scale_color_brewer theme
+#'   theme_minimal
 #' @importFrom mbte mbte_panel_plot
 #' @importFrom rlang sym
 #' @importFrom shiny is.reactive plotOutput renderPlot renderUI req selectInput
@@ -38,7 +39,10 @@ best_fit_vis_server <- function(input, output, session, rearranged,
       expr = {
         ggplot(.u_signals, aes(!!time, !!value)) +
           geom_point() +
-          geom_path(aes(color = !!color_col), data = .u_fits)
+          geom_path(aes(color = !!color_col), data = .u_fits) +
+          scale_color_brewer(palette = "Set1") +
+          theme_minimal() +
+          theme(legend.position = "bottom")
       },
       signal_id
     )
