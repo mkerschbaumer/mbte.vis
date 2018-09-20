@@ -13,11 +13,14 @@ split_fits_impl <- function(fits_tbl, target) {
   stopifnot(is_scalar_character(target))
 
   fits_tbl %>%
-    mutate(!!fits_col := map(!!fits_col, ~{
-      # only keep target column (e.g. "lm"); assumption: target column is
-      # present
-      .x[target]
-    })) %>%
+    mutate(
+      !!fits_col := map(!!fits_col, ~{
+        # only keep target column (e.g. "lm"); assumption: target column is
+        # present
+        .x[target]
+      }),
+      fit = target
+    ) %>%
     mbte_reconstruct(fits_tbl)
 }
 

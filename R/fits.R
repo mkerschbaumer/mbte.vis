@@ -44,7 +44,7 @@ filter_rearrange_fits_rv <- function(fits, metrics, ...) {
 # NOTE: it is assumed, that the column "signal_id" is present
 #' @importFrom magrittr "%>%"
 #' @importFrom mbte mbte_reconstruct
-#' @importFrom purrr map_dfr set_names
+#' @importFrom purrr map_dfr
 #' @importFrom shiny is.reactive is.reactivevalues
 combine_fits <- function(trend_rv) {
   stopifnot(is.reactivevalues(trend_rv))
@@ -60,12 +60,11 @@ combine_fits <- function(trend_rv) {
 
     trend_rv %>%
       names() %>%
-      set_names(.) %>%
       map_dfr(~{
         filtered_tbl_r <- trend_rv[[.x]]$filtered
         stopifnot(is.reactive(filtered_tbl_r))
         filtered_tbl_r()
-      }, .id = "fit") %>% # name of trend module
+      }) %>% # name of trend module
       # ensure a tbl_mbte is returned
       mbte_reconstruct(reference)
   })
