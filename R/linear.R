@@ -46,7 +46,7 @@ tm_linear_gen_plugin <- function(id, coef_env) {
         uiOutput(ns("remaining_samples"))
       )
     },
-    server = function(input, output, session, fits) {
+    server = function(input, output, session, fits, metrics) {
       coefs <- reactive({ coef_env[[id]] })
 
       # combine fits with coefficients
@@ -60,13 +60,18 @@ tm_linear_gen_plugin <- function(id, coef_env) {
           mbte_reconstruct(fits)
       })
 
+      # filtering based on metrics provided by the user; filter/rearrange
+      # according to signal_id present in both datasets (rearranging based on
+      # computed metric)
+      metric_filtered <- filter_rearrange_fits_rv(combined, metrics)
+
       # data for the histogram (selected parameter)
       plot_dataset <- reactive({
-        coefs <- coefs()
+        metric_filtered <- metric_filtered()
         relative <- input$relative
         choice <- input$to_display
-        req(coefs, choice)
-        coefs[[choice]]
+        req(metric_filtered, choice)
+        metric_filtered[[choice]]
       })
 
       # draw histogram
@@ -80,19 +85,19 @@ tm_linear_gen_plugin <- function(id, coef_env) {
       filter_expr <- callModule(expr_input_server, "filter_expr")
 
       # perform filtering based on coefficients
-      filtered <- reactive({
+      coefs_filtered <- reactive({
         filter_expr <- filter_expr()
         stopifnot(is_expression(filter_expr))
 
-        combined <- combined()
+        metric_filtered <- metric_filtered()
         coefs <- coefs()
-        req(combined, coefs)
+        req(metric_filtered, coefs)
         cols_to_drop <- colnames(coefs)
         tryCatch(
-          combined %>%
+          metric_filtered %>%
             filter(!!filter_expr) %>% # use user-provided expression
             select(-!!cols_to_drop) %>% # remove coefficient-columns
-            mbte_reconstruct(combined),
+            mbte_reconstruct(metric_filtered),
           error = function(e) {
             validate(
               need(FALSE, paste("error while evaluating filter expression", e))
@@ -101,18 +106,19 @@ tm_linear_gen_plugin <- function(id, coef_env) {
         )
       })
 
-      # show text indicating how many samples are selected
+      # show text indicating how many samples are selected (first metric-based-
+      # and then coefficient-based filtering is performed)
       output$remaining_samples <- renderUI({
-        fits <- fits()
-        filtered <- filtered()
-        total_fits <- nrow(fits)
-        selected_fits <- nrow(filtered)
+        coefs_filtered <- coefs_filtered()
+        metric_filtered <- metric_filtered()
+        total_fits <- nrow(metric_filtered)
+        selected_fits <- nrow(coefs_filtered)
         p(strong(selected_fits), "/", total_fits, " fits selected.")
       })
 
       # return reactiveValues at the end
       rv <- reactiveValues()
-      rv$filtered <- filtered
+      rv$filtered <- coefs_filtered
 
       rv
     },

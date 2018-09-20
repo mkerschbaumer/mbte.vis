@@ -54,11 +54,8 @@ wrap_plugin <- function(plugin, fits_r, metrics_r) {
     filtered
   })
 
-  # filter/rearrange fits according to fit performance
-  rearranged_fits <- filter_rearrange_fits_rv(split_fits, filtered_metrics)
-
   # create wrapper sgda.plugin: use same ID but modified server function (pass
-  # `rearranged_fits` to original server function)
+  # `split_fits` to original server function)
   #
   # NOTE: the wrapped plugin is only needed for the call to
   # plugin_create_server() in setup_trend_modules()
@@ -66,7 +63,9 @@ wrap_plugin <- function(plugin, fits_r, metrics_r) {
     plugin_extract_id(plugin),
     server = function(input, output, session) {
       server_fun <- plugin_extract_server(plugin)
-      server_fun(input, output, session, fits = rearranged_fits)
+      server_fun(input, output, session, fits = split_fits,
+        metrics = filtered_metrics
+      )
     }
   )
 }
