@@ -14,7 +14,7 @@ app_ui <- function(trend_plugins) {
     dashboardBody(
       tabItems(
         tabItem("filtering",
-          uiOutput("total_samples_display"),
+          metrics_hist_ui("metrics_filter"),
           plugin_create_ui(!!!trend_plugins, ns = NS("wrappers"))
         ),
         tabItem("fitVis",
@@ -33,7 +33,11 @@ app_server <- function(trend_plugins, fits, metrics) {
 
   function(input, output, session) {
     fits_r <- reactive(fits)
-    metrics_r <- reactive(metrics)
+    metrics_r_raw <- reactive(metrics)
+
+    metrics_r <- callModule(metrics_hist_server, "metrics_filter",
+      metrics = metrics_r_raw
+    )
 
     trend_rv <- setup_tm_servers(fits_r, metrics_r, !!!trend_plugins)
 
