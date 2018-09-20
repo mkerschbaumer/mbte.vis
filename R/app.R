@@ -40,7 +40,7 @@ app_server <- function(trend_plugins, fits, metrics) {
     filtered_combined <- combine_fits(trend_rv)
 
     # NOTE: 'fit' used for compatibility with metrics
-    rearranged <- rearrange_fits_rv(filtered_combined, metrics_r,
+    rearranged <- filter_rearrange_fits_rv(filtered_combined, metrics_r,
       by = c("signal_id", "fit")
     )
 

@@ -55,7 +55,7 @@ wrap_plugin <- function(plugin, fits_r, metrics_r) {
   })
 
   # filter/rearrange fits according to fit performance
-  rearranged_fits <- rearrange_fits_rv(split_fits, filtered_metrics)
+  rearranged_fits <- filter_rearrange_fits_rv(split_fits, filtered_metrics)
 
   # create wrapper sgda.plugin: use same ID but modified server function (pass
   # `rearranged_fits` to original server function)

@@ -1,11 +1,12 @@
 # fit-related functions
 
-# rearrange signals-table according to fit-performance
+# filter and rearrange signals-table according to fit-performance (fits are
+# removed if no corresponding metric-result is present)
 #' @importFrom dplyr arrange desc inner_join select
 #' @importFrom magrittr "%>%"
 #' @importFrom mbte is_tbl_mbte mbte_reconstruct
 #' @importFrom rlang syms
-rearrange_fits <- function(fits, metrics, by = "signal_id") {
+filter_rearrange_fits <- function(fits, metrics, by = "signal_id") {
   stopifnot(is_tbl_mbte(fits))
 
   # only keep signal_id-column and result (join afterwards should only add
@@ -21,10 +22,10 @@ rearrange_fits <- function(fits, metrics, by = "signal_id") {
     mbte_reconstruct(fits)
 }
 
-# identical to rearrange_signals() - takes reactives as input (verified via
+# identical to filter_rearrange_fits() - takes reactives as input (verified via
 # is.reactive())
 #' @importFrom shiny is.reactive reactive req
-rearrange_fits_rv <- function(fits, metrics, ...) {
+filter_rearrange_fits_rv <- function(fits, metrics, ...) {
   stopifnot(is.reactive(fits), is.reactive(metrics))
 
   reactive({
@@ -32,7 +33,7 @@ rearrange_fits_rv <- function(fits, metrics, ...) {
     metrics <- metrics()
     req(fits, metrics)
 
-    rearrange_fits(fits, metrics, ...)
+    filter_rearrange_fits(fits, metrics, ...)
   })
 }
 
