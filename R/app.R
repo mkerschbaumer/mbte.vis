@@ -16,6 +16,9 @@ app_ui <- function(trend_plugins) {
         tabItem("filtering",
           uiOutput("total_samples_display"),
           plugin_create_ui(!!!trend_plugins, ns = NS("wrappers"))
+        ),
+        tabItem("fitVis",
+          best_fit_vis_ui("bestFitVis")
         )
       )
     ),
@@ -24,7 +27,7 @@ app_ui <- function(trend_plugins) {
 }
 
 #' @importFrom mbte is_tbl_mbte
-#' @importFrom shiny reactive
+#' @importFrom shiny callModule reactive
 app_server <- function(trend_plugins, fits, metrics) {
   stopifnot(is_tbl_mbte(fits))
 
@@ -40,6 +43,11 @@ app_server <- function(trend_plugins, fits, metrics) {
     rearranged <- rearrange_fits_rv(filtered_combined, metrics_r,
       by = c("signal_id", "fit")
     )
+
+    height <- getOption("shiny.mbte.height", "800px")
+
+    callModule(best_fit_vis_server, "bestFitVis", rearranged = rearranged,
+      height = height)
   }
 }
 
