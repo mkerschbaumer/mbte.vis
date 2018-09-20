@@ -20,12 +20,23 @@ tm_linear <- function(id) {
   }
 }
 
+#' @importFrom dplyr if_else mutate
+#' @importFrom purrr map2_chr
 tm_linear_gen_plugin <- function(id, coef_env) {
   coef_filter_plugin(
     id = id,
     coef_env = coef_env,
     title = "Linear trend",
-    selected_par = "rel_slope"
+    selected_par = "rel_slope",
+    tr_fun = function(x) {
+      fit_mapper <- function(rel_slope, fit) {
+        direction <- if_else(rel_slope > 0, "growth", "decay", "unknown")
+        paste(fit, direction, sep = "_")
+      }
+
+      x %>%
+        mutate(fit_modified = map2_chr(rel_slope, fit, fit_mapper))
+    }
   )
 }
 

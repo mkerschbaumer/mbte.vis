@@ -8,6 +8,7 @@ best_fit_vis_ui <- function(id) {
 
 #' @importFrom ggplot2 aes geom_point geom_path ggplot
 #' @importFrom mbte mbte_panel_plot
+#' @importFrom rlang sym
 #' @importFrom shiny is.reactive plotOutput renderPlot renderUI req selectInput
 #'   tagList
 best_fit_vis_server <- function(input, output, session, rearranged,
@@ -21,6 +22,14 @@ best_fit_vis_server <- function(input, output, session, rearranged,
       need(nrow(rearranged) != 0, "Empty dataset: no data to plot aviablable")
     )
 
+    # use column "fit_modified" as color-column if present (column "fit" is
+    # fallback)
+    color_col <- if ("fit_modified" %in% colnames(rearranged)) {
+      sym("fit_modified")
+    } else {
+      sym("fit")
+    }
+
     time <- attr(rearranged, "time")
     value <- attr(rearranged, "value")
 
@@ -29,7 +38,7 @@ best_fit_vis_server <- function(input, output, session, rearranged,
       expr = {
         ggplot(.u_signals, aes(!!time, !!value)) +
           geom_point() +
-          geom_path(aes(color = fit), data = .u_fits)
+          geom_path(aes(color = !!color_col), data = .u_fits)
       },
       signal_id
     )
