@@ -49,8 +49,6 @@ wrap_plugin <- function(plugin, fits_r, metrics_r) {
     filtered <- metrics_r() %>%
       filter(fit == !!trend_name)
 
-    # assert, that at least 1 fit is present
-    validate(need(nrow(filtered) != 0, "Filtering produces empty metrics-table."))
     filtered
   })
 
@@ -130,12 +128,15 @@ coef_filter_plugin <- function(id, coef_env, title = id,
         width = 12,
         collapsible = TRUE,
         collapsed = TRUE,
+        shiny::actionButton(ns("debug"), "Debug"),
         uiOutput(ns("param_selector")),
         hist_filter_ui(ns("hist_selector"))
       )
     },
     server = function(input, output, session, fits, metrics) {
       coefs <- reactive({ coef_env[[id]] })
+
+      shiny::observeEvent(input$debug, browser())
 
       # combine fits with coefficients
       combined <- reactive({
