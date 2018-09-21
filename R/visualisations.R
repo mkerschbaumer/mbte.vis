@@ -12,9 +12,8 @@ best_fit_vis_ui <- function(id) {
 #' @importFrom rlang sym
 #' @importFrom shiny is.reactive plotOutput renderPlot renderUI req selectInput
 #'   tagList
-best_fit_vis_server <- function(input, output, session, rearranged,
-                                height = "800px") {
-  stopifnot(is.reactive(rearranged))
+best_fit_vis_server <- function(input, output, session, rearranged, height) {
+  stopifnot(is.reactive(rearranged), is.reactive(height))
 
   fits_plot <- reactive({
     rearranged <- rearranged()
@@ -51,11 +50,12 @@ best_fit_vis_server <- function(input, output, session, rearranged,
   output$ui <- renderUI({
     ns <- session$ns
     fits_plot <- fits_plot()
-    req(fits_plot)
+    height <- height()
+    req(fits_plot, height)
 
     tagList(
       selectInput(ns("plotSelector"), "Plot to show", seq_along(fits_plot)),
-      plotOutput(ns("plot"), height = height)
+      plotOutput(ns("plot"), height = paste0(trunc(height * 0.83), "px"))
     )
   })
 

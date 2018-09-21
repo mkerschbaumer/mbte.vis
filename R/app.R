@@ -1,3 +1,23 @@
+# insert JS code for determining window size; NOTE: solution by Xiongbing Jin
+#' @importFrom shiny tags
+window_size_js <- function() {
+  tags$head(
+    tags$script('
+      var dimension = [0, 0];
+      $(document).on("shiny:connected", function(e) {
+        dimension[0] = window.innerWidth;
+        dimension[1] = window.innerHeight;
+        Shiny.onInputChange("dimension", dimension);
+      });
+      $(window).resize(function(e) {
+        dimension[0] = window.innerWidth;
+        dimension[1] = window.innerHeight;
+        Shiny.onInputChange("dimension", dimension);
+      });
+    ')
+  )
+}
+
 #' @importFrom shiny NS column
 #' @importFrom shiny.plugin plugin_create_ui
 #' @importFrom shinydashboard dashboardBody dashboardHeader dashboardPage
@@ -9,6 +29,7 @@ app_ui <- function(trend_plugins) {
       disable = TRUE
     ),
     dashboardBody(
+      window_size_js(),
       column(3,
         metrics_hist_ui("metrics_filter"),
         plugin_create_ui(!!!trend_plugins, ns = NS("wrappers"))
@@ -22,7 +43,7 @@ app_ui <- function(trend_plugins) {
 }
 
 #' @importFrom mbte is_tbl_mbte
-#' @importFrom shiny callModule reactive
+#' @importFrom shiny callModule reactive throttle
 app_server <- function(trend_plugins, fits, metrics) {
   stopifnot(is_tbl_mbte(fits))
 
@@ -43,10 +64,12 @@ app_server <- function(trend_plugins, fits, metrics) {
       by = c("signal_id", "fit")
     )
 
-    height <- getOption("shiny.mbte.height", "800px")
+    height <- reactive(input$dimension[2])
+    throttle(height, 300)
 
-    callModule(best_fit_vis_server, "bestFitVis", rearranged = rearranged,
-      height = height)
+    callModule(best_fit_vis_server, "bestFitVis",
+      rearranged = rearranged, height = height
+    )
   }
 }
 
