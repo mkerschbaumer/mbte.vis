@@ -98,8 +98,8 @@ init_trend_modules <- function(...) {
 }
 
 # Generate a shiny.plugin, which allows coefficient-based filtering (provided,
-# that the corresponding fitting quosure stores fit-coefficients as a tibble in
-# `coef_env`). This function is intended to generate the shiny.plugin for
+# that the corresponding fitting quosure stores fit-coefficients in
+# `coef_store`). This function is intended to generate the shiny.plugin for
 # trend-modules.
 #' @importFrom dplyr bind_cols select
 #' @importFrom mbte mbte_reconstruct
@@ -110,7 +110,7 @@ init_trend_modules <- function(...) {
 #' @importFrom shiny.plugin plugin_new_default
 #' @importFrom shinydashboard box
 #' @importFrom tibble is_tibble
-coef_filter_plugin <- function(id, coef_env, title = id,
+coef_filter_plugin <- function(id, coef_store, title = id,
                                selected_par = NULL, tr_fun = function(x) x,
                                displayname = id) {
   stopifnot(is_scalar_character(id))
@@ -134,7 +134,7 @@ coef_filter_plugin <- function(id, coef_env, title = id,
       )
     },
     server = function(input, output, session, fits, metrics) {
-      coefs <- reactive({ coef_env[[id]] })
+      coefs <- reactive({ coef_store$get_tibble() })
 
       shiny::observeEvent(input$debug, browser())
 

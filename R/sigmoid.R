@@ -1,35 +1,21 @@
-#' @importFrom tibble tibble
-tm_logistic <- function(id) {
-  function(coef_env) {
-    coef_env[[id]] <- tibble(
-      A = numeric(),
-      rel_A = numeric(),
-      B = numeric(),
-      rel_B = numeric(),
-      C = numeric(),
-      rel_C = numeric(),
-      D = numeric(),
-      rel_D = numeric()
-    )
-
-    structure(
-      list(
-        fit_quo = tr_logistic_gen_quo(id, coef_env), # modified fitting quosure
-        # actual display plugin (below)
-        plugin = tr_logistic_gen_plugin(id, coef_env)
-      ),
-      # default trend module
-      class = c("dtm", "list")
-    )
-  }
+tm_logistic <- function(id = "sig", coef_store = cl_store()) {
+  structure(
+    list(
+      fit_quo = tr_logistic_gen_quo(coef_store), # modified fitting quosure
+      # actual display plugin (below)
+      plugin = tr_logistic_gen_plugin(id, coef_store)
+    ),
+    # default trend module
+    class = c("dtm", "list")
+  )
 }
 
 #' @importFrom dplyr if_else mutate
 #' @importFrom purrr pmap_chr
-tr_logistic_gen_plugin <- function(id, coef_env) {
+tr_logistic_gen_plugin <- function(id, coef_store) {
   coef_filter_plugin(
     id = id,
-    coef_env = coef_env,
+    coef_store = coef_store,
     title = "Logistic trend",
     selected_par = "B",
     tr_fun = function(x) {
@@ -47,9 +33,7 @@ tr_logistic_gen_plugin <- function(id, coef_env) {
 # modify fitting quosure for linear trend (store coefficients)
 #' @importFrom mbte tr_logistic
 #' @importFrom rlang quo
-tr_logistic_gen_quo <- function(id, coef_env) {
-  stopifnot(is.environment(coef_env))
-
+tr_logistic_gen_quo <- function(coef_store) {
   quo({
     # initialize fit parameters to `NA`
     A <- NA
@@ -60,10 +44,10 @@ tr_logistic_gen_quo <- function(id, coef_env) {
     safe_fit <- function() {
       signal_max <- max(.signal[[.value_sym]])
 
-      # ensure that the fit-coefficients are added to `coef_env` in any case
+      # ensure that the fit-coefficients are added to `coef_store` in any case
       # (even if errors are encountered)
       on.exit({
-        coef_env[[id]] <- tibble::add_row(coef_env[[id]],
+        coef_store$add_row(
           A = A,
           rel_A = A / signal_max,
           B = B,
