@@ -5,7 +5,8 @@ metrics_hist_ui <- function(id) {
 
   box(
     title = "Metric filtering",
-    width = 4,
+    width = 12,
+    collapsible = TRUE,
     selectInput(ns("metric_to_use"), "Metric to use:", character(0)),
     plotOutput(ns("metric_hist")),
     uiOutput(ns("metric_slider"))

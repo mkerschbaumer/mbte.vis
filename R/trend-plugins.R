@@ -127,7 +127,9 @@ coef_filter_plugin <- function(id, coef_env, title = id,
 
       box(
         title = title,
-        width = 4,
+        width = 12,
+        collapsible = TRUE,
+        collapsed = TRUE,
         uiOutput(ns("param_selector")),
         hist_filter_ui(ns("hist_selector"))
       )

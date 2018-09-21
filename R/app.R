@@ -1,25 +1,20 @@
-#' @importFrom shiny NS
+#' @importFrom shiny NS column
 #' @importFrom shiny.plugin plugin_create_ui
 #' @importFrom shinydashboard dashboardBody dashboardHeader dashboardPage
-#'   dashboardSidebar menuItem sidebarMenu tabItem tabItems
+#'   dashboardSidebar
 app_ui <- function(trend_plugins) {
   dashboardPage(
     dashboardHeader(title = "Fits explorer"),
     dashboardSidebar(
-      sidebarMenu(
-        menuItem("Filtering", tabName = "filtering"),
-        menuItem("Fits-visualisation", tabName = "fitVis")
-      )
+      disable = TRUE
     ),
     dashboardBody(
-      tabItems(
-        tabItem("filtering",
-          metrics_hist_ui("metrics_filter"),
-          plugin_create_ui(!!!trend_plugins, ns = NS("wrappers"))
-        ),
-        tabItem("fitVis",
-          best_fit_vis_ui("bestFitVis")
-        )
+      column(3,
+        metrics_hist_ui("metrics_filter"),
+        plugin_create_ui(!!!trend_plugins, ns = NS("wrappers"))
+      ),
+      column(9,
+        best_fit_vis_ui("bestFitVis")
       )
     ),
     skin = "black"
