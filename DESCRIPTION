@@ -1,5 +1,5 @@
-Package: shiny.mbte
-Title: Shiny frontend for signal-exploration
+Package: mbte.vis
+Title: Graphical exploration of signal-fits
 Version: 0.0.0.9000
 Authors@R: person(
     "Martin",
@@ -7,8 +7,10 @@ Authors@R: person(
     email = "maff32@gmx.com",
     role = c("aut", "cre")
   )
-Description: Provide a shiny-app, that allows to explore fitted signals
-  (using the mbte-package). Filtering can be used to specific signals.
+Description: Integrate with the trelliscopejs-package to provide filtering
+  and exploration of mbte-fitting data. If trend-fitting-modules from this
+  package are used with the mbte-package, filtering based on fit coefficients
+  can be performed too.
 Depends: R (>= 3.4.4)
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -23,4 +25,4 @@ Imports:
   shiny,
   shinydashboard,
   tibble
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
