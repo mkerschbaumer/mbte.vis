@@ -1,7 +1,8 @@
 tm_logistic <- function(id = "sig", coef_store = cl_store()) {
   structure(
     list(
-      fit_quo = tr_logistic_gen_quo(coef_store) # modified fitting quosure
+      fit_quo = tr_logistic_gen_quo(coef_store), # modified fitting quosure
+      store = coef_store
     ),
     # default trend module
     class = c("dtm", "list")
@@ -26,6 +27,7 @@ tr_logistic_gen_quo <- function(coef_store) {
       # (even if errors are encountered)
       on.exit({
         coef_store$add_row(
+          rownr = .row_nr,
           A = A,
           rel_A = A / signal_max,
           B = B,

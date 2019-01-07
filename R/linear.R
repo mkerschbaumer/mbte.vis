@@ -1,7 +1,8 @@
 tm_linear <- function(id = "lin", coef_store = cl_store()) {
   structure(
     list(
-      fit_quo = tm_linear_gen_quo(coef_store) # modified fitting quosure
+      fit_quo = tm_linear_gen_quo(coef_store), # modified fitting quosure
+      store = coef_store
     ),
     # default trend module
     class = c("dtm", "list")
@@ -22,6 +23,7 @@ tm_linear_gen_quo <- function(coef_store) {
     intercept <- coefs["(Intercept)"]
     rel_intercept <- intercept / signal_max
     coef_store$add_row(
+      rownr = .row_nr,
       slope = slope,
       rel_slope = rel_slope,
       intercept = intercept,
