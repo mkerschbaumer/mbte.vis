@@ -1,32 +1,10 @@
 tm_logistic <- function(id = "sig", coef_store = cl_store()) {
   structure(
     list(
-      fit_quo = tr_logistic_gen_quo(coef_store), # modified fitting quosure
-      # actual display plugin (below)
-      plugin = tr_logistic_gen_plugin(id, coef_store)
+      fit_quo = tr_logistic_gen_quo(coef_store) # modified fitting quosure
     ),
     # default trend module
     class = c("dtm", "list")
-  )
-}
-
-#' @importFrom dplyr if_else mutate
-#' @importFrom purrr pmap_chr
-tr_logistic_gen_plugin <- function(id, coef_store) {
-  coef_filter_plugin(
-    id = id,
-    coef_store = coef_store,
-    title = "Logistic trend",
-    selected_par = "B",
-    tr_fun = function(x) {
-      fit_mapper <- function(rel_A, rel_B, fit) {
-        direction <- if_else((rel_A * rel_B) > 0, "growth", "decay", "unknown")
-        paste(fit, direction, sep = "_")
-      }
-
-      x %>%
-        mutate(fit_modified = pmap_chr(list(rel_A, rel_B, fit), fit_mapper))
-    }
   )
 }
 
