@@ -1,7 +1,7 @@
 tm_logistic <- function(coef_store = cl_store()) {
   structure(
     list(
-      fit_quo = tr_logistic_gen_quo,
+      fit_quo = tm_logistic_gen_quo,
       store = coef_store
     ),
     # default trend module
@@ -12,7 +12,7 @@ tm_logistic <- function(coef_store = cl_store()) {
 # modify fitting quosure for linear trend (store coefficients)
 #' @importFrom mbte tr_logistic
 #' @importFrom rlang quo
-tr_logistic_gen_quo <- function(id, coef_store) {
+tm_logistic_gen_quo <- function(id, coef_store) {
   # add symbols for coefficient store
   sym_A <- gen_prefixed_sym(id, "A")
   sym_rel_A <- gen_prefixed_sym(id, "rel_A")
