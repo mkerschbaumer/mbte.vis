@@ -1,3 +1,14 @@
+#' @include trend-modules.R
+#' @describeIn trend-modules Fit a linear trend using
+#' \code{\link[mbte]{tr_linear}}. Fit coefficients:
+#' \itemize{
+#'   \item prefix_slope
+#'   \item prefix_rel_slope (relative slope - normed to signal maximum)
+#'   \item prefix_intercept
+#'   \item prefix_rel_intercept
+#' }
+#'
+#' @export
 tm_linear <- function(coef_store = cl_store()) {
   structure(
     list(

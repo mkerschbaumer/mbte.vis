@@ -1,3 +1,33 @@
+#' Trend modules for coefficient based fitting
+#'
+#' Trend modules are wrappers around
+#' \code{\link[mbte:fitting-helpers]{trend fitting helpers}} in the mbte-
+#' package. They are meant to be used with \code{\link{mbte_coef_fit}}.
+#'
+#' A fitting module consists of the following components:
+#' \describe{
+#'   \item{fitting quosure}{Adapted fitting quosure, based on the correspoding
+#'     fitting helper in the mbte-package.}
+#'   \item{coefficient store}{Stores fit coefficients.}
+#' }
+#'
+#' @param coef_store A \code{\link[mbte.vis:coef_store]{coefficient-store}} to
+#'   record fit parameters.
+#'
+#' @examples
+#' # use dataset from the mbte package
+#' library(mbte)
+#' data(filtered_signals)
+#'
+#' # perform fitting (record the coefficients)
+#' mbte_coef_fit(filtered_signals, lin = tm_linear(), log = tm_logistic())
+#'
+#' # equivalent using the mbte-package (don't store coefficients)
+#' mbte_fit(filtered_signals, lin = !!tr_linear(), log = !!tr_logistic)
+#'
+#' @name trend-modules
+NULL
+
 # extract fitting quosure from trend module
 tm_extract_quo <- function(x, ...) {
   UseMethod("tm_extract_quo")

@@ -1,3 +1,19 @@
+#' @include trend-modules.R
+#' @describeIn trend-modules Fit a logistic trend using
+#' \code{\link[mbte]{tr_logistic}}. Equation used for fitting:
+#' \code{value ~ A / (1 + exp(B * (C - time))) + D}. Fit coefficients:
+#' \itemize{
+#'   \item prefix_A
+#'   \item prefix_rel_A (relative A - normed to signal maximum)
+#'   \item prefix_B
+#'   \item prefix_rel_B
+#'   \item prefix_C
+#'   \item prefix_rel_C
+#'   \item prefix_D
+#'   \item prefix_rel_D
+#' }
+#'
+#' @export
 tm_logistic <- function(coef_store = cl_store()) {
   structure(
     list(

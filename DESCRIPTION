@@ -21,3 +21,10 @@ Imports:
   purrr,
   rlang
 RoxygenNote: 6.1.1
+Collate: 
+    'fit.R'
+    'trend-modules.R'
+    'linear.R'
+    'logistic.R'
+    'store.R'
+    'utils.R'
