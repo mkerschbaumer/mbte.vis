@@ -17,9 +17,12 @@ Encoding: UTF-8
 LazyData: true
 Imports:
   dplyr,
+  ggplot2,
   mbte,
   purrr,
-  rlang
+  rlang,
+  tidyr,
+  trelliscopejs
 RoxygenNote: 6.1.1
 Collate: 
     'fit.R'
@@ -28,3 +31,4 @@ Collate:
     'logistic.R'
     'store.R'
     'utils.R'
+    'visualize.R'
