@@ -23,7 +23,7 @@ tm_linear_gen_quo <- function(coef_store) {
     intercept <- coefs["(Intercept)"]
     rel_intercept <- intercept / signal_max
     coef_store$add_row(
-      rownr = .row_nr,
+      row_nr = .row_nr,
       slope = slope,
       rel_slope = rel_slope,
       intercept = intercept,

@@ -27,7 +27,7 @@ tr_logistic_gen_quo <- function(coef_store) {
       # (even if errors are encountered)
       on.exit({
         coef_store$add_row(
-          rownr = .row_nr,
+          row_nr = .row_nr,
           A = A,
           rel_A = A / signal_max,
           B = B,
