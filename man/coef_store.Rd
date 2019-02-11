@@ -8,9 +8,9 @@
 cl_store()
 }
 \description{
-For an interactive analysis of fits using \code{\link{run_app}}, filtering
-based on model coefficients may be required. The mentioned options below are
-available for storing model coefficients.
+For an interactive analysis of fits using \code{\link{mbte_visualize_coef}},
+filtering based on model coefficients may be required. The mentioned options
+below are available for storing model coefficients.
 }
 \details{
 A coefficient store should provide the following functions (accessible via

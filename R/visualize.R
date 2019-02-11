@@ -68,3 +68,6 @@ mbte_visualize_coef <- function(x, ...) {
     )
 }
 
+# fix R CMD CHECK issues:
+# - `coefficients`: temporary hardcoded column name for coefficient column
+globalVariables(c(".predicted", "fit", "coefficients"))

@@ -46,3 +46,9 @@ mbte_coef_fit <- function(x, ...) {
   fit_result
 }
 
+# fix R CMD CHECK issues:
+# - `.`: magrittr pipe
+# - `row_nr`: column added by trend modules in this package (rownr of the
+#     corresponding fit)
+globalVariables(c(".", "row_nr"))
+

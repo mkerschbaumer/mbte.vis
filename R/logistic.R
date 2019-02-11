@@ -27,7 +27,7 @@ tm_logistic <- function(coef_store = cl_store()) {
 
 # modify fitting quosure for linear trend (store coefficients)
 #' @importFrom mbte tr_logistic
-#' @importFrom rlang quo
+#' @importFrom rlang ":=" quo
 tm_logistic_gen_quo <- function(id, coef_store) {
   # add symbols for coefficient store
   sym_A <- gen_prefixed_sym(id, "A")
@@ -78,3 +78,8 @@ tm_logistic_gen_quo <- function(id, coef_store) {
     safe_fit()
   })
 }
+
+# Fix R CMD CHECK issues: the variables below are provided by mbte_fit() using
+# maskin.
+globalVariables(c(".signal", ".time_sym", ".value_sym", ".row_nr"))
+

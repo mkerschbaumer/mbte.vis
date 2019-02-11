@@ -22,7 +22,7 @@ tm_linear <- function(coef_store = cl_store()) {
 
 # modify fitting quosure for linear trend (store coefficients)
 #' @importFrom mbte tr_linear
-#' @importFrom rlang quo
+#' @importFrom rlang ":=" quo
 tm_linear_gen_quo <- function(id, coef_store) {
   sym_slope <- gen_prefixed_sym(id, "slope")
   sym_rel_slope <- gen_prefixed_sym(id, "rel_slope")
@@ -49,3 +49,7 @@ tm_linear_gen_quo <- function(id, coef_store) {
     fit
   })
 }
+
+# Fix R CMD CHECK issues: the variables below are provided by mbte_fit() using
+# maskin.
+globalVariables(c(".signal", ".time_sym", ".value_sym", ".row_nr"))
