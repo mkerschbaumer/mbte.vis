@@ -1,7 +1,7 @@
-tm_logistic <- function(id = "sig", coef_store = cl_store()) {
+tm_logistic <- function(coef_store = cl_store()) {
   structure(
     list(
-      fit_quo = tr_logistic_gen_quo(coef_store), # modified fitting quosure
+      fit_quo = tr_logistic_gen_quo,
       store = coef_store
     ),
     # default trend module
@@ -12,13 +12,20 @@ tm_logistic <- function(id = "sig", coef_store = cl_store()) {
 # modify fitting quosure for linear trend (store coefficients)
 #' @importFrom mbte tr_logistic
 #' @importFrom rlang quo
-tr_logistic_gen_quo <- function(coef_store) {
+tr_logistic_gen_quo <- function(id, coef_store) {
+  # add symbols for coefficient store
+  sym_A <- gen_prefixed_sym(id, "A")
+  sym_rel_A <- gen_prefixed_sym(id, "rel_A")
+  sym_B <- gen_prefixed_sym(id, "B")
+  sym_rel_B <- gen_prefixed_sym(id, "rel_B")
+  sym_C <- gen_prefixed_sym(id, "C")
+  sym_rel_C <- gen_prefixed_sym(id, "rel_C")
+  sym_D <- gen_prefixed_sym(id, "D")
+  sym_rel_D <- gen_prefixed_sym(id, "rel_D")
+
   quo({
     # initialize fit parameters to `NA`
-    A <- NA
-    B <- NA
-    C <- NA
-    D <- NA
+    A <- B <- C <- D <- NA
 
     safe_fit <- function() {
       signal_max <- max(.signal[[.value_sym]])
@@ -28,14 +35,14 @@ tr_logistic_gen_quo <- function(coef_store) {
       on.exit({
         coef_store$add_row(
           row_nr = .row_nr,
-          A = A,
-          rel_A = A / signal_max,
-          B = B,
-          rel_B = B / signal_max,
-          C = C,
-          rel_C = C / signal_max,
-          D = D,
-          rel_D = D / signal_max
+          !!sym_A := A,
+          !!sym_rel_A := A / signal_max,
+          !!sym_B := B,
+          !!sym_rel_B := B / signal_max,
+          !!sym_C := C,
+          !!sym_rel_C := C / signal_max,
+          !!sym_D := D,
+          !!sym_rel_D := D / signal_max
         )
       })
 

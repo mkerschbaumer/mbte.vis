@@ -10,10 +10,11 @@
 #' 
 #' @importFrom dplyr "%>%" arrange select
 #' @importFrom mbte mbte_fit
-#' @importFrom purrr map_dfr
+#' @importFrom purrr imap map_dfr
+#' @importFrom rlang list2
 #' @export
 mbte_coef_fit <- function(x, ...) {
-  l <- list(...)
+  l <- imap(list2(...), tm_initialize)
 
   # extract fitting quosures and coefficient stores from trend modules
   fitting_quos <- tm_extract_quos(l)

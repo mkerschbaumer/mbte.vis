@@ -1,7 +1,7 @@
-tm_linear <- function(id = "lin", coef_store = cl_store()) {
+tm_linear <- function(coef_store = cl_store()) {
   structure(
     list(
-      fit_quo = tm_linear_gen_quo(coef_store), # modified fitting quosure
+      fit_quo = tm_linear_gen_quo,
       store = coef_store
     ),
     # default trend module
@@ -12,7 +12,12 @@ tm_linear <- function(id = "lin", coef_store = cl_store()) {
 # modify fitting quosure for linear trend (store coefficients)
 #' @importFrom mbte tr_linear
 #' @importFrom rlang quo
-tm_linear_gen_quo <- function(coef_store) {
+tm_linear_gen_quo <- function(id, coef_store) {
+  sym_slope <- gen_prefixed_sym(id, "slope")
+  sym_rel_slope <- gen_prefixed_sym(id, "rel_slope")
+  sym_intercept <- gen_prefixed_sym(id, "intercept")
+  sym_rel_intercept <- gen_prefixed_sym(id, "rel_intercept")
+
   quo({
     fit <- !!tr_linear()
 
@@ -24,10 +29,10 @@ tm_linear_gen_quo <- function(coef_store) {
     rel_intercept <- intercept / signal_max
     coef_store$add_row(
       row_nr = .row_nr,
-      slope = slope,
-      rel_slope = rel_slope,
-      intercept = intercept,
-      rel_intercept = rel_intercept
+      !!sym_slope := slope,
+      !!sym_rel_slope := rel_slope,
+      !!sym_intercept := intercept,
+      !!sym_rel_intercept := rel_intercept
     )
 
     fit
