@@ -8,7 +8,7 @@
 #'
 #' @return A \code{\link[mbte:tbl_mbte]{tbl_mbte}} with fit coefiicients added.
 #' 
-#' @importFrom dplyr "%>%" arrange select
+#' @importFrom dplyr "%>%" arrange group_by select summarize_all
 #' @importFrom mbte mbte_fit
 #' @importFrom purrr imap map_dfr
 #' @importFrom rlang list2
@@ -26,6 +26,11 @@ mbte_coef_fit <- function(x, ...) {
   coefs <- stores %>%
     map_dfr(~.x$get_tibble()) %>% # extract fit coefficients
     arrange(row_nr) %>%
+    group_by(row_nr) %>%
+    # make sure only one entry per column is present
+    # NOTE: It is assumed, that fitting quosures perform one add_row()-call
+    # (regarding the coefficient store).
+    summarize_all(keep_nonNA) %>%
     {
       split(select(., -row_nr), .$row_nr)
     }
