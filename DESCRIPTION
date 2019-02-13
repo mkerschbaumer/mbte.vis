@@ -23,6 +23,7 @@ Imports:
   rlang,
   tidyr,
   trelliscopejs
+Suggests: nls2
 RoxygenNote: 6.1.1
 Collate: 
     'fit.R'
