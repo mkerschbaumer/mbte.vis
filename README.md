@@ -4,6 +4,8 @@
 # mbte.vis
 
 [![Lifecycle](https://img.shields.io/badge/lifecycle-active-green.svg)]()
+[![Travis-CI Build
+Status](https://travis-ci.org/mkerschbaumer/mbte.vis.svg?branch=master)](https://travis-ci.org/mkerschbaumer/mbte.vis)
 
 The goal of mbte is to combine the
 [mbte](https://mkerschbaumer.github.io/mbte)-package with the
