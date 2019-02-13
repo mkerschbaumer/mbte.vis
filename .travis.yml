@@ -10,3 +10,4 @@ r:
 - devel
 
 r_github_packages: mkerschbaumer/mbte
+r_packages: nls2

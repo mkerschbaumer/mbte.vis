@@ -11,7 +11,7 @@ Description: Integrate with the trelliscopejs-package to provide filtering
   and exploration of mbte-fitting data. If trend-fitting-modules from this
   package are used with the mbte-package, filtering based on fit coefficients
   can be performed too.
-Depends: R (>= 3.4.4)
+Depends: R (>= 3.4.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
