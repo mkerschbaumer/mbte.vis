@@ -6,6 +6,10 @@
 #' @inheritParams mbte::mbte_fit
 #' @param ... Trend modules to use.
 #'
+#' @note It is assumed, that each trend module adds coefficients to the
+#'   corresponding coefficient store exactly once. If fitting fails, NA's
+#'   should be added.
+#'
 #' @return A \code{\link[mbte:tbl_mbte]{tbl_mbte}} with fit coefiicients added.
 #' 
 #' @importFrom dplyr "%>%" arrange group_by select summarize_all

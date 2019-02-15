@@ -18,3 +18,8 @@ A \code{\link[mbte:tbl_mbte]{tbl_mbte}} with fit coefiicients added.
 \code{\link[mbte:mbte_fit]{mbte_fit}} is wrapped. Currently, the column
 \code{coefficients} is added to the resulting tibble.
 }
+\note{
+It is assumed, that each trend module adds coefficients to the
+  corresponding coefficient store exactly once. If fitting fails, NA's
+  should be added.
+}
