@@ -32,7 +32,7 @@ mbte_visualize_coef <- function(x, ...) {
   group_cols <- ensyms(...)
 
   time_col <- colname_time(x)
-  value_col <- colname_value
+  value_col <- colname_value(x)
 
   # unnest needed list columns
   # TODO: remove hardcoded column name
