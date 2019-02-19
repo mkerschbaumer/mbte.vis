@@ -21,7 +21,8 @@ mbte_unnest_coefficients <- function(x, colname = "coefficients") {
 #' @importFrom dplyr filter left_join mutate rename select
 #' @importFrom ggplot2 aes geom_path geom_point ggplot scale_color_brewer theme
 #'   theme_bw
-#' @importFrom mbte mbte_reconstruct mbte_unnest_signals mbte_unnest_fits
+#' @importFrom mbte colname_time colname_value mbte_reconstruct
+#'   mbte_unnest_signals mbte_unnest_fits
 #' @importFrom purrr reduce
 #' @importFrom rlang ensyms expr new_formula
 #' @importFrom trelliscopejs facet_trelliscope
@@ -30,9 +31,8 @@ mbte_visualize_coef <- function(x, ...) {
   # columns for facet grouping
   group_cols <- ensyms(...)
 
-  # TODO: use exported function from mbte package
-  time_col <- mbte:::attr_time(x)
-  value_col <- mbte:::attr_value(x)
+  time_col <- colname_time(x)
+  value_col <- colname_value
 
   # unnest needed list columns
   # TODO: remove hardcoded column name
