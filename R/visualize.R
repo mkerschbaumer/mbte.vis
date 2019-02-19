@@ -18,7 +18,7 @@ mbte_unnest_coefficients <- function(x, colname = "coefficients") {
 #' @param ... Columns to use for facetting (see
 #'   \code{\link[trelliscopejs]{facet_trelliscope}}).
 #'
-#' @importFrom dplyr filter left_join mutate rename select
+#' @importFrom dplyr arrange filter left_join mutate rename select
 #' @importFrom ggplot2 aes geom_path geom_point ggplot scale_color_brewer theme
 #'   theme_bw
 #' @importFrom mbte colname_time colname_value mbte_reconstruct
@@ -50,7 +50,9 @@ mbte_visualize_coef <- function(x, ...) {
     left_join(fits, by = c(as.character(group_cols), as.character(time_col))) %>%
     left_join(coefficients, by = as.character(group_cols)) %>%
     # remove rows, where no prediction is present
-    filter(!is.na(.predicted))
+    filter(!is.na(.predicted)) %>%
+    # ensure correct order of rows (avoid drawing artifact)
+    arrange(!!!group_cols, !!time_col)
 
   # build formula for facetting
   facet_rhs <- reduce(group_cols, ~expr(!!.x + !!.y))
