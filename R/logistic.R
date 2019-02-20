@@ -64,12 +64,14 @@ tm_logistic_gen_quo <- function(id, coef_store) {
 
       fit <- !!tr_logistic()
 
-      # override defaults with actual fit coefficients (fit successful)
-      coefs <- coefficients(fit)
-      A <- coefs["A"]
-      B <- coefs["B"]
-      C <- coefs["C"]
-      D <- coefs["D"]
+      # Override defaults with actual fit coefficients (if fit is successful)
+      if (inherits(fit, "nls")) {
+        coefs <- coefficients(fit)
+        A <- coefs["A"]
+        B <- coefs["B"]
+        C <- coefs["C"]
+        D <- coefs["D"]
+      }
 
       # return fit
       fit
